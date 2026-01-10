@@ -20,7 +20,7 @@ def create_expense_pie_chart(category_totals):
         values='Amount', 
         names='Category', 
         title='Expenses Distribution',
-        color_discrete_sequence=px.colors.sequential.Greens_r # הפלטה הירוקה שלנו
+        color_discrete_sequence=px.colors.sequential.Greens_r 
     )
     
     #Update layout style:
