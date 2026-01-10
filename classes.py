@@ -7,7 +7,8 @@ class ExpenseManager:
     """
     def __init__(self):
         self.expenses = []  #In-memory list of Expense objects
-        self.filename = "my_expenses.csv" # The name of the file where data is saved
+        self.filename = "my_expenses.csv" #The name of the file where data is saved 
+        self.budget_filename = "budget.txt" #The name of the file where budget is saved
         self.load_from_file() #Load data immediately upon instantiation
 
     def add_expense(self, expense):
@@ -107,6 +108,22 @@ class ExpenseManager:
         for cat, amount in totals.items():
             print(f"{cat}: {amount} NIS")
         print("-" * 20+"\n")
+
+    # --- Budget Management Methods ---
+    def set_budget(self, amount):
+        """Saves the budget amount to a text file."""
+        with open(self.budget_filename, 'w') as f:
+            f.write(str(amount))
+
+    def get_budget(self):
+        """Loads the budget from file. Returns 0 if not set."""
+        if not os.path.exists(self.budget_filename):
+            return 0.0
+        try:
+            with open(self.budget_filename, 'r') as f:
+                return float(f.read())
+        except ValueError:
+            return 0.0
 
 class Expense:
     """

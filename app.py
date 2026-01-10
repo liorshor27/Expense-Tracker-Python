@@ -2,7 +2,9 @@ import streamlit as st
 from classes import ExpenseManager, Expense
 from datetime import datetime 
 from styles import load_css
-        
+from charts import create_expense_pie_chart
+
+#Load custom CSS styles  
 load_css()
 
 # --- Page Setup ---
@@ -49,14 +51,30 @@ if st.sidebar.button("Add Expense"):
     else:
         st.sidebar.error("Please fill all fields correctly.")
 
+# --- Sidebar: Budget Management ---
+st.sidebar.markdown("---")
+st.sidebar.header("💳 Monthly Budget")
+
+#Load current budget
+current_budget = manager.get_budget()
+#Update budget
+new_budget = st.sidebar.number_input("Set Budget (NIS)", value=current_budget, min_value=0.0, step=100.0)
+
+if st.sidebar.button("Update Budget"):
+    manager.set_budget(new_budget)
+    st.sidebar.success("Budget Updated!")
+    st.rerun()
+
 # --- Main Display Area ---
 
 # Create two tabs: one for the raw list, one for analytics
 tab1, tab2 = st.tabs(["📋 List", "📊 Report"])
 
+#Get today's date for filtering
+today = datetime.today()
 with tab1:
     # --- Tab 1: Expense List & Management ---
-    st.subheader("Your Expenses")
+    st.subheader("All Expenses")
     
     #Check if there are expenses to display
     if manager.expenses:
@@ -91,20 +109,48 @@ with tab1:
 
 with tab2:
     # --- Tab 2: Analytics & Reports ---
-    st.subheader("Expenses by Category")
+    st.subheader(f"Overview for {today.strftime('%B %Y')}") # מציג למשל: Overview for January 2026
+    
+    #1. Filter data for the current month only
+    current_month_total = 0
+    category_totals = {}
     
     #Aggregate expenses by category using a dictionary
     totals = {}
     for exp in manager.expenses:
-        cat = exp.category
         try:
-            amt = float(exp.amount)
-            #If category exists add to it, otherwise initialize with 0
-            totals[cat] = totals.get(cat, 0) + amt
-        except:
-            pass #Skip invalid amounts
+            #Parse date to check month/year
+            exp_date_obj = datetime.strptime(exp.date, "%d/%m/%Y")
+            
+            #Check if expense belongs to current month/year
+            if exp_date_obj.month == today.month and exp_date_obj.year == today.year:
+                amt = float(exp.amount)
+                current_month_total += amt
+                category_totals[exp.category] = category_totals.get(exp.category, 0) + amt
+        except ValueError:
+            pass
+
+    #2. Calculate remaining budget
+    budget = manager.get_budget()
+    remaining = budget - current_month_total
     
-    #If we have data, display chart and total sum
-    if totals:
-        st.bar_chart(totals)
-        st.write(f"**Total Spent: {sum(totals.values())} NIS**")
+    #3. Display Metrics (KPIs)
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Monthly Budget", f"{budget:,.0f} ₪")
+    col2.metric("Total Spent", f"{current_month_total:,.0f} ₪", delta=f"-{current_month_total} this month", delta_color="inverse")
+    
+    #Dynamic coloring: Red if over budget, Green if safe
+    col3.metric("Remaining", f"{remaining:,.0f} ₪", delta=f"{remaining}", delta_color="normal" if remaining >= 0 else "inverse")
+
+    st.divider()
+
+    # 4. Display Pie Chart
+    if category_totals:
+        #Generate the chart object using the helper function from charts.py
+        fig = create_expense_pie_chart(category_totals)
+        
+        #Render the chart in Streamlit 
+        st.plotly_chart(fig, use_container_width=True)
+        
+    else:
+        st.info("No expenses recorded for this month yet.")

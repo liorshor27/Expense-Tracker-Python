@@ -18,13 +18,14 @@ This project demonstrates modular architecture, Object-Oriented Programming (OOP
 * **Data Storage:** CSV (File I/O)
 * **Libraries:** `datetime`, `csv`, `os`
 
-##📂 Project Structure
+## 📂 Project Structure
 
 * `app.py` - Main entry point for the Web Application (Streamlit).
 * `main.py` - Main entry point for the Command Line Interface (CLI).
 * `classes.py` - Logic layer containing `Expense` and `ExpenseManager` classes.
-* `validations.py` - Helper functions for robust input validation.
+* `charts.py` - Handles data visualization and graph generation (Plotly).
 * `styles.py` - Manages the CSS and visual styling of the application.
+* `validations.py` - Helper functions for robust input validation.
 
 ##💻 How to Run
 
