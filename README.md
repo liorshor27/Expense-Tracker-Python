@@ -32,5 +32,5 @@ This project demonstrates modular architecture, Object-Oriented Programming (OOP
 
 ### 1. Web Dashboard (Recommended)
 ```bash
-pip install streamlit
+pip install streamlit plotly
 streamlit run app.py
