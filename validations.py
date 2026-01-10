@@ -22,7 +22,7 @@ def get_valid_category():
         
         #Validate that the input is a digit and within the valid range
         if choice.isdigit(): 
-            idx = int(choice) - 1 #Ajust the users choise to an array that starts at index 0
+            idx = int(choice) - 1 #Adjust the users choise to an array that starts at index 0
             if 0 <= idx < len(CATEGORIES):
                 return CATEGORIES[idx] #Return catgory name string
         else:
@@ -40,11 +40,11 @@ def get_valid_amount():
         try:
             amount = float(amount_str) 
             if amount > 0:
-                return amount_str # Return as a string
+                return amount_str #Return as a string
             else: 
                 print("Amount must be positive.")
 
-        # Handle cases where input is not a number (e.g., "abc")
+        #Handle cases where input is not a number (e.g., "abc")
         except ValueError:
             print("Invalid input. Please enter a number.")
 
