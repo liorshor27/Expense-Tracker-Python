@@ -1,6 +1,9 @@
 import streamlit as st
 from classes import ExpenseManager, Expense
 from datetime import datetime 
+from styles import load_css
+        
+load_css()
 
 # --- Page Setup ---
 st.title("💰 My Expense Tracker")
