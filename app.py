@@ -109,7 +109,7 @@ with tab1:
 
 with tab2:
     # --- Tab 2: Analytics & Reports ---
-    st.subheader(f"Overview for {today.strftime('%B %Y')}") # מציג למשל: Overview for January 2026
+    st.subheader(f"Overview for {today.strftime('%B %Y')}") 
     
     #1. Filter data for the current month only
     current_month_total = 0
