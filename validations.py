@@ -22,9 +22,9 @@ def get_valid_category():
         
         #Validate that the input is a digit and within the valid range
         if choice.isdigit(): 
-            idx = int(choice) - 1 #Adjust the users choise to an array that starts at index 0
+            idx = int(choice) - 1 #Adjust the users choice to an array that starts at index 0
             if 0 <= idx < len(CATEGORIES):
-                return CATEGORIES[idx] #Return catgory name string
+                return CATEGORIES[idx] #Return category name string
         else:
             print("Invalid choice. Please choose a number from the list.")
 

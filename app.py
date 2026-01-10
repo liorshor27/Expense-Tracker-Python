@@ -3,6 +3,7 @@ from classes import ExpenseManager, Expense
 from datetime import datetime 
 from styles import load_css
 from charts import create_expense_pie_chart
+from utils import get_available_months, filter_expenses_by_period, analyze_spending_trends
 
 #Load custom CSS styles  
 load_css()
@@ -65,10 +66,40 @@ if st.sidebar.button("Update Budget"):
     st.sidebar.success("Budget Updated!")
     st.rerun()
 
+# --- Time Filter ---
+st.sidebar.markdown("---")
+st.sidebar.header("📅 Time Filter")
+
+#Dynamic Month Loading:
+#Fetch available months from utils to populate the dropdown
+sorted_months = get_available_months(manager.expenses)
+filter_options = ["Current Month"] + sorted_months + ["All History"]
+
+selected_period = st.sidebar.selectbox("Select Period", filter_options, index=0)
+
+# --- Sidebar: SaaS Analysis ---
+st.sidebar.markdown("---")
+if st.sidebar.button("📊 Run Analysis"):
+    #Perform trend analysis using utils
+    curr, avg, is_high = analyze_spending_trends(manager.expenses)
+    
+    if avg > 0:
+        if is_high:
+            st.sidebar.error(f"⚠️ High Spending! You passed your average of {avg:.0f} NIS.")
+        else:
+            st.sidebar.success(f"✅ Good Job! You are below your average of {avg:.0f} NIS.")
+    else:
+        st.sidebar.info("Not enough data history to calculate average.")
+
+
 # --- Main Display Area ---
 
-# Create two tabs: one for the raw list, one for analytics
+#Create two tabs: one for the raw list, one for analytics
 tab1, tab2 = st.tabs(["📋 List", "📊 Report"])
+
+#Filter Logic:
+#Delegate filtering responsibility to utils function
+filtered_expenses, target_month_str = filter_expenses_by_period(manager.expenses, selected_period)
 
 #Get today's date for filtering
 today = datetime.today()

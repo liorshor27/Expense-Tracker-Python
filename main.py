@@ -31,6 +31,18 @@ def main():
 
         elif choice == "3":
             manager.print_report_by_category()
+            budget = manager.get_budget()
+            if budget > 0:
+                total_spent = sum(float(exp.amount) for exp in manager.expenses)
+                remaining = budget - total_spent
+                
+                print(f"--- Budget Status ---")
+                print(f"Monthly Budget: {budget} NIS")
+                print(f"Total Spent:    {total_spent} NIS")
+                print(f"Remaining:      {remaining} NIS")
+                print("-" * 20 + "\n")
+            else:
+                print("(No budget set for this month)\n")
 
         elif choice == "4":
             manager.print_all_expenses() 

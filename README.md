@@ -26,6 +26,7 @@ This project demonstrates modular architecture, Object-Oriented Programming (OOP
 * `charts.py` - Handles data visualization and graph generation (Plotly).
 * `styles.py` - Manages the CSS and visual styling of the application.
 * `validations.py` - Helper functions for robust input validation.
+* `utils.py` - Contains helper functions for date parsing, data filtering, and trend analysis logic.
 
 ##💻 How to Run
 
