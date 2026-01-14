@@ -114,11 +114,28 @@ with tab1:
         data = []
         i=1
         for exp in manager.expenses:
-            data.append({"Number": i, "Date": exp.date, "Category": exp.category, "Name": exp.name, "Amount": f"{exp.amount} NIS"})
-            i+=1
+            date_obj = datetime.strptime(exp.date, "%d/%m/%Y").date()
+            data.append({
+                "Number": i, 
+                "Date": date_obj,  
+                "Category": exp.category, 
+                "Name": exp.name, 
+                "Amount": float(exp.amount) 
+            })
+            i += 1
+        st.dataframe(
+            data,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Number": st.column_config.NumberColumn("Number", format="%d", width="small"),
+                "Date": st.column_config.DateColumn("Date", format="DD/MM/YYYY"), 
+                "Amount": st.column_config.NumberColumn("Amount", format="%.2f NIS"), 
+                "Category": st.column_config.TextColumn("Category"),
+                "Name": st.column_config.TextColumn("Name")
+            }
+        )
         
-        #Render the static table
-        st.table(data)
         
         # --- Deletion Section ---
         st.divider()
