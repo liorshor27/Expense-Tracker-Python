@@ -81,7 +81,7 @@ selected_period = st.sidebar.selectbox("Select Period", filter_options, index=0)
 st.sidebar.markdown("---")
 if st.sidebar.button("📊 Run Analysis"):
     #Perform trend analysis using utils
-    curr, avg, is_high = analyze_spending_trends(manager.expenses)
+    curr, avg, is_high = analyze_spending_trends(manager.expenses,selected_period)
     
     if avg > 0:
         if is_high:
@@ -89,7 +89,7 @@ if st.sidebar.button("📊 Run Analysis"):
         else:
             st.sidebar.success(f"✅ Good Job! You are below your average of {avg:.0f} NIS.")
     else:
-        st.sidebar.info("Not enough data history to calculate average.")
+        st.sidebar.info("Not enough data history to calculate trends yet.")
 
 
 # --- Main Display Area ---
@@ -114,7 +114,7 @@ with tab1:
         data = []
         i=1
         for exp in manager.expenses:
-            data.append({"Index": i, "Date": exp.date, "Category": exp.category, "Name": exp.name, "Amount": f"{exp.amount} NIS"})
+            data.append({"Number": i, "Date": exp.date, "Category": exp.category, "Name": exp.name, "Amount": f"{exp.amount} NIS"})
             i+=1
         
         #Render the static table
@@ -125,7 +125,7 @@ with tab1:
         st.write("### Delete Expense")
 
         #Numeric input for selecting the item index
-        del_num = st.number_input("Enter Index to delete", min_value=1, step=1)
+        del_num = st.number_input("Enter line number to delete", min_value=1, step=1)
         if st.button("Delete"):
             #Convert user-friendly index (1-based) to list index (0-based)
             manager.delete_expense(del_num - 1)

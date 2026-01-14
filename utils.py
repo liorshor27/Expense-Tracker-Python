@@ -59,37 +59,86 @@ def filter_expenses_by_period(expenses, selected_period):
             
     return filtered_expenses, target_month
 
-def analyze_spending_trends(expenses):
+from datetime import datetime
+
+from datetime import datetime
+
+def analyze_spending_trends(expenses, selected_month_str=None):
     """
-    Calculates current month spending vs. historical average.
+    Analyzes spending trends by comparing a specific month's spending
+    against the average of strictly previous months.
+
+    Args:
+        expenses (list): A list of Expense objects containing date and amount.
+        selected_month_str (str, optional): The target month in 'MM/YYYY' format.
+                                            If None or 'All History', defaults to current date.
+
     Returns:
-        - current_spent (float)
-        - avg_spent (float)
-        - is_high (bool): True if spending is above average
+        tuple: A tuple containing:
+            - current_spent (float): Total spending for the target month.
+            - avg_spent (float): Average spending of all previous months.
+            - is_high (bool): True if current spending exceeds average by >10%.
     """
-    today = datetime.today()
-    current_month_str = today.strftime('%m/%Y')
     
-    monthly_sums = {}
-    
-    #Aggregate spending by month
-    for exp in expenses:
+    # 1. Determine the target month for analysis
+    if selected_month_str and selected_month_str != "All History":
         try:
-            dt = datetime.strptime(exp.date, "%d/%m/%Y")
-            m_str = dt.strftime('%m/%Y')
-            monthly_sums[m_str] = monthly_sums.get(m_str, 0) + float(exp.amount)
+            # Parse the selected month from the dropdown (MM/YYYY)
+            month, year = selected_month_str.split("/")
+            current_month_dt = datetime(int(year), int(month), 1)
         except ValueError:
-            pass
-            
-    current_spent = monthly_sums.get(current_month_str, 0)
-    
-    #Calculate average of PAST months only
-    past_months = [val for key, val in monthly_sums.items() if key != current_month_str]
-    
-    avg_spent = 0
-    if past_months:
-        avg_spent = sum(past_months) / len(past_months)
+            # Fallback to today if parsing fails
+            today = datetime.today()
+            current_month_dt = datetime(today.year, today.month, 1)
+    else:
+        # Default to current real-world date
+        today = datetime.today()
+        current_month_dt = datetime(today.year, today.month, 1)
+
+    monthly_sums = {}
+
+    # 2. Aggregate expenses by month (Robust date parsing)
+    for exp in expenses:
+        if not exp.date: 
+            continue
         
-    is_high = current_spent > avg_spent and avg_spent > 0
+        dt_obj = None
+        date_str = str(exp.date).strip()
+        
+        # Try parsing multiple date formats to ensure data integrity
+        # Supports: DD/MM/YYYY (IL/EU), YYYY-MM-DD (ISO/DB), MM/DD/YYYY (US)
+        for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y"):
+            try:
+                dt_obj = datetime.strptime(date_str, fmt)
+                break
+            except ValueError:
+                continue
+        
+        if dt_obj:
+            # Normalize to the first day of the month for grouping
+            month_key = datetime(dt_obj.year, dt_obj.month, 1)
+            try:
+                monthly_sums[month_key] = monthly_sums.get(month_key, 0) + float(exp.amount)
+            except ValueError:
+                pass # Skip invalid amounts
+
+    # 3. Calculate Metrics
+    current_spent = monthly_sums.get(current_month_dt, 0)
+
+    # Filter: Include only months strictly BEFORE the target month
+    # This prevents future months or the current month from skewing the average
+    past_values = [
+        amount for m, amount in monthly_sums.items()
+        if m < current_month_dt
+    ]
+
+    # Calculate historical average
+    avg_spent = 0
+    if past_values:
+        avg_spent = sum(past_values) / len(past_values)
     
+    # 4. Determine Status (High spending flag)
+    # Threshold includes a 10% buffer to avoid false alarms on minor deviations
+    is_high = current_spent > avg_spent * 1.1 if avg_spent > 0 else False
+
     return current_spent, avg_spent, is_high
