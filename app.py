@@ -11,24 +11,21 @@ load_css()
 # --- Page Setup ---
 st.title("💰 My Expense Tracker")
 
-# --- Session State Initialization ---
-# Streamlit reruns the entire script upon every interaction (button click, input change).
-# We use 'st.session_state' to persist the ExpenseManager object across these reruns.
-# Without this, the manager would reset to empty every time the user clicks a button.
-
+# Ensure ExpenseManager persists across reruns.
 if 'manager' not in st.session_state:
     st.session_state.manager = ExpenseManager()
 
 #Create a local reference for easier access
 manager = st.session_state.manager
 
-# --- Sidebar: Add New Expense ---
+# Sidebar: Add New Expense
 st.sidebar.header("Add New Expense")
 
-#User Inputs
-#We default the date to today
+# User Inputs
+# We default the date to today
 input_date = st.sidebar.date_input("Date", datetime.today())
-#Convert date object to string format (DD/MM/YYYY) for storage
+
+# Format date for database storage.
 date_str = input_date.strftime("%d/%m/%Y")
 
 categories = ["Food", "Transport", "Bills", "Shopping", "Entertainment", "Other"]
@@ -45,8 +42,8 @@ if st.sidebar.button("Add Expense"):
         new_expense = Expense(date_str, input_category, input_name, str(input_amount))
         manager.add_expense(new_expense)
 
-        #Add to manager and save immediately to CSV
-        manager.save_to_file()
+        #Add to manager and save 
+        manager.add_expense(new_expense)
 
         st.sidebar.success("Added successfully!")
     else:
@@ -146,9 +143,6 @@ with tab1:
         if st.button("Delete"):
             #Convert user-friendly index (1-based) to list index (0-based)
             manager.delete_expense(del_num - 1)
-
-            #Save changes to file
-            manager.save_to_file()
 
             #Rerun the app to refresh the table immediately
             st.rerun() 

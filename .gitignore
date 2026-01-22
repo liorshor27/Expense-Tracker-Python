@@ -2,5 +2,4 @@
 __pycache__/
 
 # Ignore user data
-*.csv
-*.txt
+.env

@@ -12,7 +12,7 @@ def main():
         print("3. Show Report (By Category)")
         print("4. Delete Expense")
         print("5. Set Monthly Budget")
-        print("6. Save & Exit")
+        print("6. Exit")
 
         choice = input("Select option: ")
 
@@ -62,7 +62,6 @@ def main():
             print("Budget updated successfully!")
             
         elif choice == "6":
-            manager.save_to_file()
             print("Goodbye!")
             break 
         else:

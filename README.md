@@ -1,36 +1,69 @@
-#💰Expense Tracker App
+# 💰 Personal Expense Tracker
 
-A smart expense tracking application built with **Python**. 
-This project demonstrates modular architecture, Object-Oriented Programming (OOP), and features both a **Command Line Interface (CLI)** and a modern **Web Dashboard** using Streamlit.
+A smart expense tracking application designed to help manage monthly budgets effectively.
 
-##🚀Features
+I built this project to simulate a real-world **Full-Stack development process**. It started as a simple script using CSV files, and I later refactored it to work with a **PostgreSQL database** to implement proper data management and security practices.
 
-* **Dual Interface:** Run it as a simple CLI tool or a full Web App.
-* **Data Persistence:** Automatically saves and loads data using CSV.
-* **Smart Analytics:** View expenses by category with automatic aggregation.
-* **Input Validation:** Robust error handling for dates and amounts.
-* **Interactive UI:** (Web Mode) Filter, view tables, and delete records visually.
+The app features a **Web Dashboard** (Streamlit) for visualization and a **CLI** tool for quick updates.
 
-##🛠️ Tech Stack
+## 🚀 Features
+
+* **SQL Database:** Transferred data storage from CSV to **PostgreSQL** to handle queries efficiently and support more data.
+* **Security Best Practices:** Database credentials are managed via **Environment Variables** (`.env`) to prevent exposing sensitive data in the code.
+* **Interactive Dashboard:** A user-friendly interface to filter expenses by month, view breakdowns by category (Pie Charts), and track budget goals.
+* **Smart Analytics:**
+    * Calculates spending trends (comparing current month vs. average).
+    * Uses SQL aggregations for faster performance.
+* **CRUD Operations:** Full ability to Add, View, Delete, and Update expenses directly in the DB.
+
+## 🛠️ Tech Stack
 
 * **Language:** Python 3.10+
-* **GUI Framework:** Streamlit
-* **Data Storage:** CSV (File I/O)
-* **Libraries:** `datetime`, `csv`, `os`
+* **Frontend:** Streamlit, Plotly (for charts)
+* **Database:** PostgreSQL
+* **Libraries:** `psycopg2` (SQL Adapter), `python-dotenv`
 
 ## 📂 Project Structure
 
-* `app.py` - Main entry point for the Web Application (Streamlit).
-* `main.py` - Main entry point for the Command Line Interface (CLI).
-* `classes.py` - Logic layer containing `Expense` and `ExpenseManager` classes.
-* `charts.py` - Handles data visualization and graph generation (Plotly).
-* `styles.py` - Manages the CSS and visual styling of the application.
-* `validations.py` - Helper functions for robust input validation.
-* `utils.py` - Contains helper functions for date parsing, data filtering, and trend analysis logic.
+* `app.py` - Main Web Application file (UI & State).
+* `classes.py` - Contains the `ExpenseManager` class (Backend logic & SQL connection).
+* `main.py` - Command Line Interface (CLI) for terminal usage.
+* `utils.py` - Helper functions for data parsing and trend analysis.
+* `charts.py` - Generates the Plotly graphs.
+* `init_db.py` - One-time script to initialize the database tables.
 
-##💻 How to Run
+## ⚙️ Setup & Installation
 
-### 1. Web Dashboard (Recommended)
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/liorshor27/Expense-Tracker-Python.git](https://github.com/liorshor27/Expense-Tracker-Python.git)
+    cd Expense-Tracker-Python
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Database Configuration:**
+    * Make sure you have PostgreSQL installed.
+    * Create a database named `expenses_db`.
+    * Create a `.env` file in the root folder and add your local DB credentials:
+        ```env
+        DB_HOST=localhost
+        DB_NAME=expenses_db
+        DB_USER=postgres
+        DB_PASS=your_password
+        ```
+
+4.  **Initialize Tables:**
+    Run this script once to set up the tables:
+    ```bash
+    python init_db.py
+    ```
+
+## ▶️ Usage
+
+**To run the Web Dashboard:**
 ```bash
-pip install streamlit plotly
 streamlit run app.py
