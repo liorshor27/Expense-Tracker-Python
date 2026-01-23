@@ -26,9 +26,7 @@ class ExpenseManager:
 
     def get_connection(self):
         """
-        Establishes and returns a new connection to the PostgreSQL database.
-        Returns:
-            psycopg2.extensions.connection: The database connection object.
+        Returns a new database connection.
         """
         return psycopg2.connect(
             host=DB_HOST,
@@ -47,11 +45,11 @@ class ExpenseManager:
         # Create expenses table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS expenses (
-                id SERIAL PRIMARY KEY,
-                date VARCHAR(20),
-                category VARCHAR(50),
-                name VARCHAR(100),
-                amount NUMERIC
+            id SERIAL PRIMARY KEY,
+            date DATE,  
+            category VARCHAR(50),
+            name VARCHAR(100),
+            amount NUMERIC
             );
         """)
         
@@ -75,7 +73,6 @@ class ExpenseManager:
     def load_from_db(self):
         """
         Fetches all expenses from the database and populates the in-memory list.
-        Replaces the old 'load_from_file' CSV method.
         """
         self.expenses = []
         conn = self.get_connection()
@@ -95,9 +92,7 @@ class ExpenseManager:
 
     def add_expense(self, expense):
         """
-        Adds a new expense object to the database and the internal list.
-        Args:
-            expense (Expense): The expense object to add.
+        Adds an expense to the database and in-memory list.
         """
         conn = self.get_connection()
         cur = conn.cursor()
@@ -141,10 +136,6 @@ class ExpenseManager:
             print(f"Deleted: {removed_item.name} from Database and memory!") 
         else:
             print("Error: Invalid expense number.")
-
-    def save_to_file(self):
-        # Deprecated. Kept for backward compatibility with CLI.
-        print("Data is automatically saved to the Database.")
 
     def print_all_expenses(self):
         """
@@ -202,6 +193,40 @@ class ExpenseManager:
         conn.close()
         return float(result[0]) if result else 0.0
 
+    def get_spending_analysis(self):
+        """
+        Analyzes spending trends by comparing current month's spending against 
+        the historical average of all previous months.
+        """
+        conn = self.get_connection()
+        cur = conn.cursor()
+        
+        # Calculate average monthly spending from all months BEFORE current month
+        cur.execute("""
+            SELECT AVG(monthly_total)
+            FROM (
+                SELECT SUM(amount) as monthly_total
+                FROM expenses
+                WHERE date < DATE_TRUNC('month', CURRENT_DATE)
+                GROUP BY DATE_TRUNC('month', date)
+            ) sub;
+        """)
+        avg_result = cur.fetchone()[0]
+        average_spending = float(avg_result) if avg_result else 0.0
+
+        # Calculate total spending for the current month
+        cur.execute("""
+            SELECT SUM(amount)
+            FROM expenses
+            WHERE date >= DATE_TRUNC('month', CURRENT_DATE);
+        """)
+        curr_result = cur.fetchone()[0]
+        current_month_total = float(curr_result) if curr_result else 0.0
+
+        cur.close()
+        conn.close()
+
+        return current_month_total, average_spending
 
 class Expense:
     """

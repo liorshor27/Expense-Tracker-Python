@@ -1,69 +1,61 @@
-# 💰 Personal Expense Tracker
+# Personal Expense Tracker
 
-A smart expense tracking application designed to help manage monthly budgets effectively.
+Expense tracking app I built to practice full-stack development. Started as a simple CSV script, then migrated to PostgreSQL for better data handling.
 
-I built this project to simulate a real-world **Full-Stack development process**. It started as a simple script using CSV files, and I later refactored it to work with a **PostgreSQL database** to implement proper data management and security practices.
+Has both a web dashboard (Streamlit) and a CLI for quick terminal access.
 
-The app features a **Web Dashboard** (Streamlit) for visualization and a **CLI** tool for quick updates.
+## Features
 
-## 🚀 Features
+* PostgreSQL database (moved from CSV)
+* Environment variables for DB credentials (no hardcoded passwords)
+* Web dashboard with month filtering and category breakdowns
+* Spending analysis comparing current month vs historical average
+* Full CRUD operations
 
-* **SQL Database:** Transferred data storage from CSV to **PostgreSQL** to handle queries efficiently and support more data.
-* **Security Best Practices:** Database credentials are managed via **Environment Variables** (`.env`) to prevent exposing sensitive data in the code.
-* **Interactive Dashboard:** A user-friendly interface to filter expenses by month, view breakdowns by category (Pie Charts), and track budget goals.
-* **Smart Analytics:**
-    * Calculates spending trends (comparing current month vs. average).
-    * Uses SQL aggregations for faster performance.
-* **CRUD Operations:** Full ability to Add, View, Delete, and Update expenses directly in the DB.
+## Tech Stack
 
-## 🛠️ Tech Stack
+* Python 3.10+
+* Streamlit for the web UI
+* Plotly for charts
+* PostgreSQL
+* psycopg2, python-dotenv
 
-* **Language:** Python 3.10+
-* **Frontend:** Streamlit, Plotly (for charts)
-* **Database:** PostgreSQL
-* **Libraries:** `psycopg2` (SQL Adapter), `python-dotenv`
+## Project Structure
 
-## 📂 Project Structure
+* `app.py` - Streamlit web app
+* `classes.py` - ExpenseManager class, handles DB connections and CRUD
+* `main.py` - CLI interface
+* `utils.py` - Helper functions for filtering and analysis
+* `charts.py` - Plotly chart generation
 
-* `app.py` - Main Web Application file (UI & State).
-* `classes.py` - Contains the `ExpenseManager` class (Backend logic & SQL connection).
-* `main.py` - Command Line Interface (CLI) for terminal usage.
-* `utils.py` - Helper functions for data parsing and trend analysis.
-* `charts.py` - Generates the Plotly graphs.
-* `init_db.py` - One-time script to initialize the database tables.
+## Setup
 
-## ⚙️ Setup & Installation
+1. Clone the repo:
+```bash
+git clone https://github.com/liorshor27/Expense-Tracker-Python.git
+cd Expense-Tracker-Python
+```
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/liorshor27/Expense-Tracker-Python.git](https://github.com/liorshor27/Expense-Tracker-Python.git)
-    cd Expense-Tracker-Python
-    ```
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-2.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+3. Set up PostgreSQL:
+   - Make sure PostgreSQL is running
+   - Create a database called `expenses_db`
+   - Create a `.env` file in the project root:
+     ```env
+     DB_HOST=localhost
+     DB_NAME=expenses_db
+     DB_USER=postgres
+     DB_PASS=your_password
+     ```
 
-3.  **Database Configuration:**
-    * Make sure you have PostgreSQL installed.
-    * Create a database named `expenses_db`.
-    * Create a `.env` file in the root folder and add your local DB credentials:
-        ```env
-        DB_HOST=localhost
-        DB_NAME=expenses_db
-        DB_USER=postgres
-        DB_PASS=your_password
-        ```
+4. Tables are created automatically when you first run the app (ExpenseManager handles it).
 
-4.  **Initialize Tables:**
-    Run this script once to set up the tables:
-    ```bash
-    python init_db.py
-    ```
+## Usage
 
-## ▶️ Usage
-
-**To run the Web Dashboard:**
+Run the web dashboard:
 ```bash
 streamlit run app.py

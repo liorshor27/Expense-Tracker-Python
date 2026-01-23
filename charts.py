@@ -2,13 +2,13 @@ import plotly.express as px
 
 def create_expense_pie_chart(category_totals):
     """
-    Generates a styled interactive pie chart for expense distribution.
-
+    Creates a pie chart from category totals.
+    
     Args:
-        category_totals (dict): A dictionary where keys are categories and values are amounts.
-
+        category_totals: dict with categories as keys and amounts as values
+    
     Returns:
-        plotly.graph_objects.Figure: The styled pie chart figure ready for rendering.
+        plotly Figure object
     """
     #Convert the dictionary to lists required for the plot
     chart_data = {"Category": list(category_totals.keys()), 

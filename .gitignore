@@ -3,3 +3,8 @@ __pycache__/
 
 # Ignore user data
 .env
+
+# Virtual environments
+env/
+venv/
+.venv/
