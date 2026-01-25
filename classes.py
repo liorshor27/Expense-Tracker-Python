@@ -1,6 +1,7 @@
 import psycopg2
 import os
 from dotenv import load_dotenv, find_dotenv # Load database credentials from environment variables.
+from datetime import datetime
 
 load_dotenv(find_dotenv())
 
@@ -83,9 +84,20 @@ class ExpenseManager:
         rows = cur.fetchall()
         
         for row in rows:
-            # row structure: (date, category, name, amount, id)
-            new_expense = Expense(row[0], row[1], row[2], float(row[3]), row[4])
+            raw_date = row[0]
+            if isinstance(raw_date, datetime) or hasattr(raw_date, 'strftime'):
+                clean_date = raw_date.strftime("%d/%m/%Y")
+            elif isinstance(raw_date, str) and "-" in raw_date:
+                try:
+                    dt_obj = datetime.strptime(raw_date, "%Y-%m-%d")
+                    clean_date = dt_obj.strftime("%d/%m/%Y")
+                except ValueError:
+                    clean_date = raw_date # Fallback
+            else:
+                clean_date = str(raw_date)
+            new_expense = Expense(clean_date, row[1], row[2], float(row[3]), row[4])
             self.expenses.append(new_expense)
+            
             
         cur.close()
         conn.close()
@@ -97,11 +109,17 @@ class ExpenseManager:
         conn = self.get_connection()
         cur = conn.cursor()
         
+        try:
+            dt_obj = datetime.strptime(expense.date, "%d/%m/%Y")
+            formatted_date = dt_obj.strftime("%Y-%m-%d")
+        except ValueError:
+            formatted_date = expense.date
+
         # Insert into DB and return the generated ID
         cur.execute("""
             INSERT INTO expenses (date, category, name, amount)
             VALUES (%s, %s, %s, %s) RETURNING id;
-        """, (expense.date, expense.category, expense.name, expense.amount))
+        """, (formatted_date, expense.category, expense.name, expense.amount))
         
         new_id = cur.fetchone()[0]
         expense.id = new_id  # Assign the DB ID to the object
@@ -117,8 +135,6 @@ class ExpenseManager:
     def delete_expense(self, expense_index):
         """
         Removes an expense from the list and the database based on its list index.
-        Args:
-            expense_index (int): The 0-based index of the item to remove.
         """
         if 0 <= expense_index < len(self.expenses):
             expense_to_remove = self.expenses[expense_index]

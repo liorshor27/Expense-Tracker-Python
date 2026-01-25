@@ -1,4 +1,4 @@
-#Import classes and validation functions from other modules
+# Import classes and validation functions from other modules
 from classes import ExpenseManager, Expense
 from validations import get_valid_date, get_valid_amount, get_valid_category
 
