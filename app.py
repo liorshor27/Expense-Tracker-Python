@@ -72,7 +72,7 @@ selected_period = st.sidebar.selectbox("Select Period", filter_options, index=0)
 st.sidebar.markdown("---")
 if st.sidebar.button("📊 Run Analysis"):
     # Perform trend analysis using utils
-    curr, avg = manager.get_spending_analysis()
+    curr, avg = manager.get_spending_analysis(selected_period)
     is_high = curr > avg
     if avg > 0:
         if is_high:
@@ -83,6 +83,7 @@ if st.sidebar.button("📊 Run Analysis"):
             st.sidebar.markdown(f"*(Current: {curr:,.0f} ₪)*") 
     else:
         st.sidebar.info("Insufficient data history for trend analysis.")
+    
 
 
 # Main Display Area
@@ -171,13 +172,13 @@ with tab2:
     else:
         remaining = budget - period_total
     
-    # Display Metrics (KPIs)
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Monthly Budget", f"{budget:,.0f} ₪")
-    col2.metric("Total Spent", f"{period_total:,.0f} ₪")
+        # Display Metrics (KPIs)
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Monthly Budget", f"{budget:,.0f} ₪")
+        col2.metric("Total Spent", f"{period_total:,.0f} ₪")
     
-    # Dynamic coloring: Red if over budget, Green if safe
-    col3.metric("Remaining", f"{remaining:,.0f} ₪", 
+        # Dynamic coloring: Red if over budget, Green if safe
+        col3.metric("Remaining", f"{remaining:,.0f} ₪", 
                 delta=f"{remaining:,.0f}", 
                 delta_color="normal" if remaining >= 0 else "inverse")
 

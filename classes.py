@@ -209,24 +209,33 @@ class ExpenseManager:
         conn.close()
         return float(result[0]) if result else 0.0
 
-    def get_spending_analysis(self):
+    def get_spending_analysis(self,selected_month_str=None):
         """
-        Analyzes spending trends by comparing current month's spending against 
-        the historical average of all previous months.
+        Analyzes spending based on the selected month.
         """
         conn = self.get_connection()
         cur = conn.cursor()
+
+        target_date = datetime.today()
         
+        if selected_month_str and selected_month_str != "All History":
+            try:
+                target_date = datetime.strptime(selected_month_str, "%m/%Y")
+            except ValueError:
+                pass
+
+        target_date_sql = target_date.strftime('%Y-%m-%d')
         # Calculate average monthly spending from all months BEFORE current month
         cur.execute("""
             SELECT AVG(monthly_total)
             FROM (
                 SELECT SUM(amount) as monthly_total
                 FROM expenses
-                WHERE date < DATE_TRUNC('month', CURRENT_DATE)
-                GROUP BY DATE_TRUNC('month', date)
+                WHERE date::DATE < %s::DATE
+                GROUP BY DATE_TRUNC('month', date::DATE)
             ) sub;
-        """)
+        """, (target_date_sql,))
+
         avg_result = cur.fetchone()[0]
         average_spending = float(avg_result) if avg_result else 0.0
 
@@ -234,15 +243,16 @@ class ExpenseManager:
         cur.execute("""
             SELECT SUM(amount)
             FROM expenses
-            WHERE date >= DATE_TRUNC('month', CURRENT_DATE);
-        """)
+            WHERE DATE_TRUNC('month', date::DATE) = DATE_TRUNC('month', %s::DATE);
+        """, (target_date_sql,))
+
         curr_result = cur.fetchone()[0]
-        current_month_total = float(curr_result) if curr_result else 0.0
+        selected_month_total = float(curr_result) if curr_result else 0.0
 
         cur.close()
         conn.close()
 
-        return current_month_total, average_spending
+        return selected_month_total, average_spending
 
 class Expense:
     """
