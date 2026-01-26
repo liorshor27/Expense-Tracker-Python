@@ -54,6 +54,9 @@ pip install -r requirements.txt
 
 4. Tables are created automatically when you first run the app (ExpenseManager handles it).
 
+5. <img width="1792" height="886" alt="image" src="https://github.com/user-attachments/assets/32a92aaf-f2bb-49d5-afe4-50a9deba52f3" />
+
+
 ## Usage
 
 Run the web dashboard:
